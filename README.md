@@ -63,13 +63,37 @@ npm start <input: access log path> <optional: output filePath>
 
 example:
 ```
-npm start ./test/logs/test.access.logs /Users/jordeguevara/Desktop/myData
+npm start ./test/logs/test.access.log 
 ```
 <small><i> If output file Path is omitted it will default to current directory in which it was called<i> </small>
 
 Output
 ```
-Your CSV is ready at /Users/jordeguevara/Desktop/myData.csv
+Your CSV is ready at ./
 ```
 There will be a csv file at that location
+
 ### Docker
+
+```
+docker build -t <your username>/parser .
+```
+Your image will now be listed by Docker:
+```
+$ docker images
+
+# Example
+REPOSITORY                      TAG        ID              CREATED
+node                            10         1934b0b038d1    5 days ago
+<your username>/parser          latest     d64d3505b0d2    1 minute ago
+```
+
+```
+docker run --name parser --rm -ti <your username>/parser /bin/bash
+```
+Now you should be able to access terminal in container
+
+```
+npm test
+npm start ./test/logs/test.access.log 
+```
