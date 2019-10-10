@@ -55,8 +55,13 @@ cd logParser
 npm install
 ```
 
-4) 
 
+4) 
+```
+npm test
+```
+
+5)
 ```
 npm start <input: access log path> <optional: output filePath>
 ```
@@ -69,12 +74,13 @@ npm start ./test/logs/test.access.log
 
 Output
 ```
-Your CSV is ready at ./
+Your CSV is ready at ./result.csv
 ```
 There will be a csv file at that location
 
 ### Docker
 
+Build your image
 ```
 docker build -t <your username>/parser .
 ```
@@ -88,6 +94,7 @@ node                            10         1934b0b038d1    5 days ago
 <your username>/parser          latest     d64d3505b0d2    1 minute ago
 ```
 
+Run it 
 ```
 docker run --name parser --rm -ti <your username>/parser /bin/bash
 ```
@@ -96,4 +103,18 @@ Now you should be able to access terminal in container
 ```
 npm test
 npm start ./test/logs/test.access.log 
+cat result.csv
 ```
+
+### Tech Used
+
+- Node(10.16.3)
+    - Npm
+        - ua-parser-js
+        - geolite
+        
+        - Mocha
+        - Sinon
+        - Chai
+        - EsLint
+        - Json2csv
