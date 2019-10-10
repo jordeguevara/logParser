@@ -30,13 +30,46 @@ Requirements
 
 Bonus
 
-⬜️ Do this all with Docker
+✅ Do this all with Docker
 
 ✅ Unit Tests
 
+## How to use
 
+### Node
 
+1) Clone the repo
+```
+git clone https://github.com/jordeguevara/logParser.git
+```
 
+2) go into the logParser dir
 
+```
+cd logParser
+```
 
+3) Install dependencies via npm
 
+```
+npm install
+```
+
+4) 
+
+```
+npm start <input: access log path> <optional: output filePath>
+```
+
+example:
+```
+npm start ./test/logs/test.access.logs /Users/jordeguevara/Desktop/myData
+```
+<small><i> If output file Path is omitted it will default to current directory in which it was called<i> </small>
+
+Output
+```
+Your CSV is ready at /Users/jordeguevara/Desktop/myData.csv
+```
+There will be a csv file at that location
+### Docker
