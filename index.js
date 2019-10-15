@@ -1,15 +1,19 @@
-const { createReadStream } = require('fs');
+const { createReadStream,createWriteStream } = require('fs');
 const { lookup } = require('geoip-lite');
 const parser = require('ua-parser-js');
 const { createInterface } = require('readline');
-const { Parser } = require('json2csv');
-const { writeCSV } = require('./utils/util');
 const {
   validateDeviceData,
   validateLocationData,
 } = require('./utils/validate');
 
+var csvWriter = require('csv-write-stream')
+var writer = csvWriter({ headers: ['state', 'country', 'browser', 'device']})
+const locationCache = new Map();
+const userAgentCache = new Map();
+
 function LogParser(filePath, outputFile, cb) {
+  console.time('par')
   try {
     if (!filePath) throw new Error('Need to specify log path');
     if (!outputFile) {
@@ -20,27 +24,38 @@ function LogParser(filePath, outputFile, cb) {
       crlfDelay: Infinity,
     });
 
-    const data = [];
+    writer.pipe(createWriteStream(outputFile))
+
     rl.on('line', (line) => {
       // Gets line and splits it by " - " where the ip is the first value
       const IPAddress = line.split(' - ')[0];
-      const locationData = lookup(IPAddress); // translate to data object with region and country and city
-      const userAgentData = parser(line); // get userAgent data
+      let locationData; //= lookup(IPAddress);
+      let userAgentData; //= parser(line);
+      if(locationCache.get(IPAddress))
+        locationData = locationCache.get(IPAddress)
+      else{
+        locationData = lookup(IPAddress)
+        locationCache.set(IPAddress,locationData)
+      }
+      if(userAgentCache.get(line))
+        userAgentData = userAgentCache.get(line)
+      else{
+        userAgentData = parser(line);
+        userAgentCache.set(line,userAgentData)
+      }
       const result = {
         state: validateLocationData('region', locationData),
         country: validateLocationData('country', locationData),
         browser: validateDeviceData('browser', userAgentData),
         device: validateDeviceData('device', userAgentData),
       };
-      data.push(result);
+      writer.write(result)
     });
 
     rl.on('close', () => {
-      const fields = ['state', 'country', 'browser', 'device'];
-      const json2csvParser = new Parser({ fields });
-      const csv = json2csvParser.parse(data);
-      writeCSV(`${outputFile}.csv`, csv);
-      cb(null, csv);
+      cb(null, outputFile);
+      writer.end()
+      console.timeEnd('par')
     });
   } catch (e) {
     throw new Error(e.message);
